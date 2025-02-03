@@ -1,3 +1,15 @@
+from flask import Flask, render_template, jsonify
+import google.generativeai as genai
+import speech_recognition as sr
+import pyttsx3
+import pyaudio
+import wave
+import tempfile
+import os
+import threading
+
+app = Flask(__name__)
+
 import google.generativeai as genai
 import speech_recognition as sr
 import pyttsx3
@@ -199,3 +211,18 @@ if __name__ == '__main__':
     voicebot_thread = threading.Thread(target=run_voicebot, daemon=True)
     voicebot_thread.start()
     gui.run()
+
+    # Example route to render index.html
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+# Example route to interact with the voice bot logic
+@app.route('/process_audio', methods=['POST'])
+def process_audio():
+    # Here you can use your existing functions to process audio and generate responses
+    response = "This is a response from the bot."
+    return jsonify({'response': response})
+
+if __name__ == '__main__':
+    app.run(debug=True)
