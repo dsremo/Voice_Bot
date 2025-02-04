@@ -1,0 +1,40 @@
+/* Reset and body styling */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #2b2b2b;
+  font-family: Arial, sans-serif;
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* Container styling */
+.container {
+  background-color: #1e1e1e;
+  border-radius: 8px;
+  padding: 30px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Heading styling */
+h1 {
+  margin-bottom: 20px;
+  color: #ffdd00;
+}
+
+/* Instruction and status styling */
+#instruction {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+#status {
+  margin-top: 15px;
+  font-size: 16px;
+}
