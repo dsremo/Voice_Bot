@@ -1,6 +1,6 @@
 # Striker VoiceBot
 
-Striker VoiceBot is a voice-controlled AI assistant that responds to spoken prompts using Google's Generative AI. It listens for a wake word ("striker") and engages in conversation using text-to-speech and speech recognition.
+Striker VoiceBot is a voice-controlled AI assistant that responds to spoken prompts using Google's Generative AI. It listens for a wake word ("striker") and engages in conversation using text-to-speech and speech recognition and answers in the same language in which the question is asked.
 
 ### -- Jupyter file can be run independently
 ### -- main.py can be run independently
