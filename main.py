@@ -1,4 +1,4 @@
-! pip install google-generativeai SpeechRecognition pyttsx3 pyaudio wave
+! pip install google-generativeai SpeechRecognition pyttsx3 pyaudio wave langdetect gtts pygame
 
 import google.generativeai as genai
 import speech_recognition as sr
@@ -11,6 +11,11 @@ import time
 import threading
 import tkinter as tk
 from tkinter import scrolledtext, font
+from langdetect import detect
+from gtts import gTTS
+import os
+import tempfile
+import pygame
 
 WAKE_WORD = 'striker'
 conversation_mode = False
@@ -36,38 +41,52 @@ convo = model.start_chat()
 system_message = (
     "INSTRUCTIONS: You are a voice assistant. Respond to prompts with meaningful, coherent responses. "
     "Provide helpful and informative answers and avoid irrelevant responses. Prioritize logic and facts. "
+    "Answer in the same language in which the question is asked."
 )
 convo.send_message(system_message.replace('\n', ' '))
 
+def detect_language(text):
+    try:
+        return detect(text)
+    except:
+        return "en"  # Default to English if detection fails
+
 def speak(text):
+    lang = detect_language(text)
+    print(f"Detected Language: {lang}")
+
     engine = pyttsx3.init()
-    engine.setProperty('rate', 150)
-    engine.setProperty('volume', 1)
     voices = engine.getProperty('voices')
-    if len(voices) > 1:
-        engine.setProperty('voice', voices[1].id)
-    
-    with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as fp:
-        temp_filename = fp.name
-    engine.save_to_file(text, temp_filename)
-    engine.runAndWait()
-    
-    wf = wave.open(temp_filename, 'rb')
-    pa = pyaudio.PyAudio()
-    stream = pa.open(format=pa.get_format_from_width(wf.getsampwidth()),
-                     channels=wf.getnchannels(),
-                     rate=wf.getframerate(),
-                     output=True)
-    chunk_size = 1024
-    data = wf.readframes(chunk_size)
-    while data:
-        stream.write(data)
-        data = wf.readframes(chunk_size)
-    stream.stop_stream()
-    stream.close()
-    pa.terminate()
-    wf.close()
-    os.remove(temp_filename)
+
+    # Check if a suitable voice is available
+    selected_voice = None
+    for voice in voices:
+        if lang in voice.id or lang in voice.name.lower():
+            selected_voice = voice.id
+            break
+
+    if selected_voice:
+        # Use pyttsx3 if a voice is available
+        engine.setProperty('voice', selected_voice)
+        engine.setProperty('rate', 150)
+        engine.setProperty('volume', 1)
+        engine.say(text)
+        engine.runAndWait()
+    else:
+        # Fallback to gTTS for unsupported languages
+        print(f"No system voice found for {lang}. Using gTTS.")
+        tts = gTTS(text=text, lang=lang)
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_audio:
+            temp_filename = temp_audio.name
+        tts.save(temp_filename)
+
+        pygame.mixer.init()
+        pygame.mixer.music.load(temp_filename)
+        pygame.mixer.music.play()
+        while pygame.mixer.music.get_busy():
+            continue
+        pygame.mixer.quit()
+        os.remove(temp_filename)
 
 def transcribe_audio(audio_path):
     global retries
